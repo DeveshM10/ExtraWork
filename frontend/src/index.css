@@ -1,0 +1,24 @@
+/* Placeholder theme: colours and fonts get replaced with the live site's. */
+:root {
+  --bg: #ffffff;
+  --text: #1a1a1a;
+  --muted: #666666;
+  --accent: #d62828;
+  --max: 1200px;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; color: var(--text); background: var(--bg); }
+a { color: inherit; }
+.container { max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+.section { padding: 64px 16px; }
+.site-header { border-bottom: 1px solid #eee; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+.logo { font-weight: 700; text-decoration: none; font-size: 1.25rem; }
+.nav-link { margin-left: 24px; text-decoration: none; color: var(--muted); }
+.nav-link.active { color: var(--accent); }
+.site-footer { border-top: 1px solid #eee; padding: 24px 0; color: var(--muted); font-size: 0.9rem; }
+.contact-form { display: grid; gap: 12px; max-width: 520px; }
+.contact-form input, .contact-form textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font: inherit; }
+.contact-form button { padding: 12px; border: 0; border-radius: 6px; background: var(--accent); color: #fff; font: inherit; cursor: pointer; }
+.form-status.error { color: #b00020; }
+.form-status.done { color: #1b7f3b; }
