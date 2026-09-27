@@ -1,0 +1,21 @@
+# dependencies
+node_modules/
+
+# vercel
+.vercel
+
+# env / secrets — never commit these
+.env
+.env.*
+!.env.example
+
+# runtime data (contact-form fallback log, local dev database)
+site/contact-submissions.log
+*.local.db
+data/*.json
+!data/.gitkeep
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log

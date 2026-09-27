@@ -1,0 +1,5 @@
+# The PHP endpoint is for PHP hosts only. On Vercel the contact form uses
+# api/contact.js instead. Excluding it so the source is never served as a
+# static file.
+contact.php
+contact-submissions.log
