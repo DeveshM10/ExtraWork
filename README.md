@@ -1,11 +1,16 @@
 # Print Media Online — static site rebuild
 
-A self-contained static rebuild of the four public pages of `printmediaonline.com`,
+A self-contained static rebuild of the five public pages of `printmediaonline.com`,
 reconstructed from the live site's served markup after the original WordPress
-source was lost.
+source was lost — plus a fresh **client portal** (sign-in / sign-up / dashboard)
+rebuilt from scratch to replace the lost WordPress login.
 
-Everything needed to serve the site is in [`site/`](site/). There are no build
-steps, no package manager, and no database.
+Everything is in [`site/`](site/). The marketing pages are plain static HTML with
+no build step. The portal adds a small set of serverless functions (`site/api/`)
+that need Node and, in production, a database — see **Client portal** below.
+
+**Live:** GitHub → [github.com/DeveshM10/ExtraWork](https://github.com/DeveshM10/ExtraWork) ·
+deployed on Vercel (project `extrawork`).
 
 ---
 
@@ -109,6 +114,58 @@ Open [`site/assets/js/form-handler.js`](site/assets/js/form-handler.js) and set
    fields pre-filled. Works anywhere, but converts poorly.
 
 Please send a real test submission and confirm it arrives before going live.
+
+---
+
+## Client portal (sign-in / sign-up / dashboard)
+
+The original site had a client login (the user icon in the header). That ran on
+WordPress and was lost with the rest. It's been rebuilt from scratch as a real,
+working auth system rather than a mock — the header user icon now points at
+[`/portal/login/`](site/portal/login/).
+
+**Pages** (styled to match the brand — amber on dark, the company's own logo):
+
+- `site/portal/login/` — sign in with username or email
+- `site/portal/register/` — create a client account
+- `site/portal/dashboard/` — protected; redirects to login without a session
+
+**API** (Vercel serverless, `site/api/auth/`): `register`, `login`, `logout`,
+`me`. Passwords are hashed with bcrypt (cost 12); sessions are signed JWTs in an
+httpOnly, SameSite=Lax cookie (Secure in production). Sign-in accepts a username
+or an email, and returns the same message for a wrong password as for an unknown
+user, so the form can't be used to discover which usernames exist.
+
+### Two environment variables to set before it's production-ready
+
+| Var | Purpose | If unset |
+|---|---|---|
+| `SESSION_SECRET` | Signs session cookies. Use a long random string. | Dev-only fallback locally; **the API refuses to sign sessions in production**, so login won't work until it's set. |
+| `DATABASE_URL` | Postgres connection string (Vercel Postgres, Neon, Supabase, … all work). | Falls back to a temp-file store — fine for local `vercel dev`, but on Vercel `/tmp` is per-instance and wiped, so **accounts won't persist** until this is set. |
+
+Set both in Vercel → Project → Settings → Environment Variables, then redeploy.
+Creating a Vercel Postgres store from the dashboard sets `DATABASE_URL` for you.
+The `portal_users` table is created automatically on first use.
+
+### Running the portal locally
+
+```bash
+cd site
+npm install
+vercel dev          # serves the static pages + the /api functions together
+# open http://localhost:3000/portal/register/
+```
+
+(Plain `python -m http.server` serves the pages but not the API, so login won't
+work under it — use `vercel dev` for the full flow.)
+
+### Note on the old credentials
+
+The old portal's `TCS` / `businesscard` login belonged to the previous
+WordPress install and is deliberately **not** carried over — hard-coding a known
+username/password into a public repo would be a security hole. The new system is
+sign-up based: clients create their own accounts. (That old password should be
+treated as compromised now that it's been shared in plain text.)
 
 ---
 

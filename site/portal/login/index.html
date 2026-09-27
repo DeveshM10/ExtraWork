@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Client Login — Print Media Online</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="../assets/portal.css">
+</head>
+<body>
+  <header class="pmo-topbar">
+    <a href="/"><img src="../../wp-content/uploads/2021/10/logo-N-600x96.png" alt="Print Media Online"></a>
+    <a class="home-link" href="/">← Back to site</a>
+  </header>
+
+  <main class="auth-wrap">
+    <form class="auth-card" id="login-form" novalidate>
+      <h1>Client Login</h1>
+      <p class="sub">Sign in to track your print orders and files.</p>
+
+      <div class="msg" id="msg" role="alert"></div>
+
+      <div class="field">
+        <label for="username">Username or email</label>
+        <input id="username" name="username" type="text" autocomplete="username" required autofocus>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+
+      <button class="btn" type="submit">Sign In</button>
+
+      <div class="auth-alt">
+        New client? <a href="/portal/register/">Create an account</a>
+      </div>
+    </form>
+  </main>
+
+  <footer class="pmo-foot">© Print Media Online · +1 (732) 993-5043 · order@printmediaonline.com</footer>
+
+  <script src="../assets/portal.js"></script>
+  <script>
+    (async function () {
+      // Already signed in? Go straight to the dashboard.
+      if (await Portal.me()) { location.replace('/portal/dashboard/'); return; }
+
+      var form = document.getElementById('login-form');
+      var msg = document.getElementById('msg');
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        Portal.hideMsg(msg);
+        var btn = form.querySelector('button');
+        var body = {
+          username: form.username.value.trim(),
+          password: form.password.value,
+        };
+        if (!body.username || !body.password) {
+          Portal.showMsg(msg, 'Please enter your username and password.', 'err'); return;
+        }
+        Portal.busy(btn, true, 'Signing in…');
+        var r = await Portal.post('/api/auth/login', body);
+        Portal.busy(btn, false);
+        if (r.ok && r.data.ok) {
+          location.href = '/portal/dashboard/';
+        } else {
+          Portal.showMsg(msg, (r.data && r.data.message) || 'Sign-in failed. Please try again.', 'err');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

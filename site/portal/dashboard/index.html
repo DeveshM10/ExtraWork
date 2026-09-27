@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Dashboard — Print Media Online</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="../assets/portal.css">
+</head>
+<body>
+  <header class="pmo-topbar">
+    <a href="/"><img src="../../wp-content/uploads/2021/10/logo-N-600x96.png" alt="Print Media Online"></a>
+    <a class="home-link" href="/">View site</a>
+  </header>
+
+  <!-- Shown only after the session check passes. -->
+  <div class="center-load" id="loading">Loading your dashboard…</div>
+
+  <main class="dash-wrap" id="dash" hidden>
+    <div class="dash-head">
+      <div>
+        <h1 id="greeting">Welcome</h1>
+        <div class="who" id="who"></div>
+      </div>
+      <button class="logout-btn" id="logout">Sign out</button>
+    </div>
+
+    <section class="cards">
+      <div class="stat"><div class="k">Active Orders</div><div class="v">0</div><div class="d">Nothing in production</div></div>
+      <div class="stat"><div class="k">In Review</div><div class="v">0</div><div class="d">No proofs awaiting approval</div></div>
+      <div class="stat"><div class="k">Completed</div><div class="v">0</div><div class="d">No past orders yet</div></div>
+      <div class="stat"><div class="k">Saved Files</div><div class="v">0</div><div class="d">No uploads yet</div></div>
+    </section>
+
+    <section class="panel">
+      <h2>Recent Orders</h2>
+      <div class="empty-note">
+        You don't have any orders yet. Start one by sending a print request — your
+        jobs and proofs will appear here once our team logs them.
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Start something</h2>
+      <div class="quick">
+        <a href="/forms/">Print request form</a>
+        <a href="/services/">Browse services</a>
+        <a href="/contact-us/">Get a quote</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Your account</h2>
+      <div class="order-row"><span class="meta">Name</span><span id="acc-name"></span></div>
+      <div class="order-row"><span class="meta">Username</span><span id="acc-username"></span></div>
+      <div class="order-row"><span class="meta">Email</span><span id="acc-email"></span></div>
+      <div class="order-row"><span class="meta">Company</span><span id="acc-company"></span></div>
+    </section>
+  </main>
+
+  <footer class="pmo-foot">© Print Media Online · +1 (732) 993-5043 · order@printmediaonline.com</footer>
+
+  <script src="../assets/portal.js"></script>
+  <script>
+    (async function () {
+      var user = await Portal.me();
+      if (!user) { location.replace('/portal/login/'); return; }
+
+      document.getElementById('greeting').textContent =
+        'Welcome, ' + (user.name || user.username).split(' ')[0];
+      document.getElementById('who').textContent =
+        (user.company ? user.company + ' · ' : '') + '@' + user.username;
+
+      document.getElementById('acc-name').textContent = user.name || '—';
+      document.getElementById('acc-username').textContent = user.username;
+      document.getElementById('acc-email').textContent = user.email;
+      document.getElementById('acc-company').textContent = user.company || '—';
+
+      document.getElementById('loading').hidden = true;
+      document.getElementById('dash').hidden = false;
+
+      document.getElementById('logout').addEventListener('click', async function () {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
+        location.href = '/portal/login/';
+      });
+    })();
+  </script>
+</body>
+</html>
