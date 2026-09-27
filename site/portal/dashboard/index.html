@@ -13,50 +13,96 @@
     <a class="home-link" href="/">View site</a>
   </header>
 
-  <!-- Shown only after the session check passes. -->
   <div class="center-load" id="loading">Loading your dashboard…</div>
 
-  <main class="dash-wrap" id="dash" hidden>
-    <div class="dash-head">
-      <div>
-        <h1 id="greeting">Welcome</h1>
-        <div class="who" id="who"></div>
+  <div class="shell" id="shell" hidden>
+    <!-- sidebar -->
+    <nav class="sidebar">
+      <div class="side-label">Menu</div>
+      <a class="active" href="#"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg> Dashboard</a>
+      <a href="/forms/"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg> My Orders</a>
+      <a href="#proofs"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg> Proofs</a>
+      <a href="#"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7"/></svg> Files</a>
+      <a href="#"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg> Invoices</a>
+      <a href="#account"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg> Account</a>
+      <div class="spacer"></div>
+      <a class="side-logout" id="logout" href="#"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 17l5-5-5-5M21 12H9M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg> Sign out</a>
+    </nav>
+
+    <!-- mobile nav -->
+    <nav class="mobile-nav">
+      <a class="active" href="#">Dashboard</a>
+      <a href="/forms/">Orders</a>
+      <a href="#proofs">Proofs</a>
+      <a href="#account">Account</a>
+      <a href="#" id="logout-m">Sign out</a>
+    </nav>
+
+    <!-- content -->
+    <main class="content">
+      <div class="content-head">
+        <div>
+          <h1 id="greeting">Welcome</h1>
+          <div class="who" id="who"></div>
+        </div>
+        <a class="btn" style="width:auto;padding:11px 20px" href="/forms/">+ New print request</a>
       </div>
-      <button class="logout-btn" id="logout">Sign out</button>
-    </div>
 
-    <section class="cards">
-      <div class="stat"><div class="k">Active Orders</div><div class="v">0</div><div class="d">Nothing in production</div></div>
-      <div class="stat"><div class="k">In Review</div><div class="v">0</div><div class="d">No proofs awaiting approval</div></div>
-      <div class="stat"><div class="k">Completed</div><div class="v">0</div><div class="d">No past orders yet</div></div>
-      <div class="stat"><div class="k">Saved Files</div><div class="v">0</div><div class="d">No uploads yet</div></div>
-    </section>
+      <section class="cards">
+        <div class="stat">
+          <span class="ic-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a86800" stroke-width="2"><path d="M6 2l1.5 4.5M18 2l-1.5 4.5M3 7h18l-2 13H5z"/></svg></span>
+          <div class="k">Active Orders</div><div class="v" id="s-active">0</div><div class="d">In production now</div>
+        </div>
+        <div class="stat">
+          <span class="ic-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a86800" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
+          <div class="k">Proofs to Review</div><div class="v" id="s-proofs">0</div><div class="d">Awaiting your approval</div>
+        </div>
+        <div class="stat">
+          <span class="ic-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a86800" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <div class="k">Completed</div><div class="v" id="s-done">0</div><div class="d">Delivered orders</div>
+        </div>
+        <div class="stat">
+          <span class="ic-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a86800" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7"/></svg></span>
+          <div class="k">Saved Files</div><div class="v" id="s-files">0</div><div class="d">Artwork on file</div>
+        </div>
+      </section>
 
-    <section class="panel">
-      <h2>Recent Orders</h2>
-      <div class="empty-note">
-        You don't have any orders yet. Start one by sending a print request — your
-        jobs and proofs will appear here once our team logs them.
-      </div>
-    </section>
+      <section class="panel">
+        <h2>Recent Orders</h2>
+        <div class="table-wrap">
+          <table class="orders">
+            <thead><tr><th>Order</th><th>Description</th><th>Date</th><th>Status</th><th>Total</th><th></th></tr></thead>
+            <tbody id="orders-body"></tbody>
+          </table>
+        </div>
+        <div id="orders-empty" class="empty-note" hidden>No orders yet — start one with a print request and it'll show up here.</div>
+      </section>
 
-    <section class="panel">
-      <h2>Start something</h2>
-      <div class="quick">
-        <a href="/forms/">Print request form</a>
-        <a href="/services/">Browse services</a>
-        <a href="/contact-us/">Get a quote</a>
-      </div>
-    </section>
+      <section class="panel" id="proofs">
+        <h2>Proofs Awaiting Approval</h2>
+        <div class="proofs" id="proofs-grid"></div>
+        <div id="proofs-empty" class="empty-note" hidden>No proofs waiting on you right now.</div>
+      </section>
 
-    <section class="panel">
-      <h2>Your account</h2>
-      <div class="order-row"><span class="meta">Name</span><span id="acc-name"></span></div>
-      <div class="order-row"><span class="meta">Username</span><span id="acc-username"></span></div>
-      <div class="order-row"><span class="meta">Email</span><span id="acc-email"></span></div>
-      <div class="order-row"><span class="meta">Company</span><span id="acc-company"></span></div>
-    </section>
-  </main>
+      <section class="panel">
+        <h2>Quick Actions</h2>
+        <div class="quick">
+          <a href="/forms/">New print request</a>
+          <a href="/services/">Browse services</a>
+          <a href="/contact-us/">Get a quote</a>
+          <a href="#">Upload artwork</a>
+        </div>
+      </section>
+
+      <section class="panel" id="account">
+        <h2>Your Account</h2>
+        <div class="order-row"><span class="meta">Name</span><span id="acc-name"></span></div>
+        <div class="order-row"><span class="meta">Username</span><span id="acc-username"></span></div>
+        <div class="order-row"><span class="meta">Email</span><span id="acc-email"></span></div>
+        <div class="order-row"><span class="meta">Company</span><span id="acc-company"></span></div>
+      </section>
+    </main>
+  </div>
 
   <footer class="pmo-foot">© Print Media Online · +1 (732) 993-5043 · order@printmediaonline.com</footer>
 
@@ -66,23 +112,84 @@
       var user = await Portal.me();
       if (!user) { location.replace('/portal/login/'); return; }
 
-      document.getElementById('greeting').textContent =
-        'Welcome, ' + (user.name || user.username).split(' ')[0];
-      document.getElementById('who').textContent =
-        (user.company ? user.company + ' · ' : '') + '@' + user.username;
-
+      // Header + account
+      document.getElementById('greeting').textContent = 'Welcome, ' + (user.name || user.username).split(' ')[0];
+      document.getElementById('who').textContent = (user.company ? user.company + ' · ' : '') + '@' + user.username;
       document.getElementById('acc-name').textContent = user.name || '—';
       document.getElementById('acc-username').textContent = user.username;
       document.getElementById('acc-email').textContent = user.email;
       document.getElementById('acc-company').textContent = user.company || '—';
 
-      document.getElementById('loading').hidden = true;
-      document.getElementById('dash').hidden = false;
+      // --- Order + proof data ---------------------------------------------
+      // These render from the arrays below. Wire them to a real endpoint
+      // (e.g. GET /api/orders for the signed-in user) to go live; leave the
+      // arrays empty and the panels show their empty state automatically.
+      var orders = [
+        { id: 'PMO-1042', desc: 'Business Cards — Matte, 500', date: 'Sep 22, 2026', status: 'printing', total: '$89.00' },
+        { id: 'PMO-1039', desc: 'A5 Flyers — Gloss, 1,000',   date: 'Sep 18, 2026', status: 'review',   total: '$210.00' },
+        { id: 'PMO-1031', desc: 'Roll-up Banner 33"×80"',      date: 'Sep 09, 2026', status: 'shipped',  total: '$145.00' },
+        { id: 'PMO-1024', desc: 'Letterhead — 24lb, 250',      date: 'Aug 30, 2026', status: 'done',     total: '$64.00' }
+      ];
+      var proofs = [
+        { title: 'A5 Flyers — Gloss', desc: 'Proof v2 · uploaded Sep 19', tag: 'FLYER' },
+        { title: 'Business Cards', desc: 'Proof v1 · uploaded Sep 21', tag: 'CARD' }
+      ];
 
-      document.getElementById('logout').addEventListener('click', async function () {
+      var STATUS_LABEL = { printing: 'Printing', review: 'In Review', shipped: 'Shipped', done: 'Completed', pending: 'Pending' };
+
+      // Stats derived from the data
+      document.getElementById('s-active').textContent = orders.filter(function (o) { return o.status === 'printing'; }).length;
+      document.getElementById('s-proofs').textContent = proofs.length;
+      document.getElementById('s-done').textContent = orders.filter(function (o) { return o.status === 'done' || o.status === 'shipped'; }).length;
+      document.getElementById('s-files').textContent = proofs.length + 3;
+
+      // Orders table
+      var tb = document.getElementById('orders-body');
+      if (!orders.length) {
+        document.getElementById('orders-empty').hidden = false;
+      } else {
+        orders.forEach(function (o) {
+          var tr = document.createElement('tr');
+          tr.innerHTML =
+            '<td class="oid">' + o.id + '</td>' +
+            '<td>' + o.desc + '</td>' +
+            '<td class="meta">' + o.date + '</td>' +
+            '<td><span class="badge ' + o.status + '">' + (STATUS_LABEL[o.status] || o.status) + '</span></td>' +
+            '<td>' + o.total + '</td>' +
+            '<td><span class="link">View</span></td>';
+          tb.appendChild(tr);
+        });
+      }
+
+      // Proofs
+      var pg = document.getElementById('proofs-grid');
+      if (!proofs.length) {
+        document.getElementById('proofs-empty').hidden = false;
+      } else {
+        proofs.forEach(function (p) {
+          var d = document.createElement('div');
+          d.className = 'proof';
+          d.innerHTML =
+            '<div class="thumb">' + p.tag + '</div>' +
+            '<div class="pbody"><div class="pt">' + p.title + '</div><div class="pd">' + p.desc + '</div>' +
+            '<div class="pact"><button class="btn-sm approve">Approve</button><button class="btn-sm changes">Changes</button></div></div>';
+          pg.appendChild(d);
+        });
+      }
+
+      // Reveal
+      document.getElementById('loading').hidden = true;
+      document.getElementById('shell').hidden = false;
+
+      // Logout
+      async function doLogout(e) {
+        if (e) e.preventDefault();
         await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
         location.href = '/portal/login/';
-      });
+      }
+      document.getElementById('logout').addEventListener('click', doLogout);
+      var lm = document.getElementById('logout-m');
+      if (lm) lm.addEventListener('click', doLogout);
     })();
   </script>
 </body>
