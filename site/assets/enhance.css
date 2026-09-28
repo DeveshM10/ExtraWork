@@ -1,0 +1,52 @@
+/* Print Media Online — polish layer.
+   Loaded AFTER the Elementor stylesheets. Everything here is additive: it only
+   affects :hover / :focus states and transitions, so the static pixel-perfect
+   layout is unchanged — no element moves until the user interacts with it. */
+
+html { scroll-behavior: smooth; }
+
+/* Accessible keyboard focus in the brand amber */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.elementor-button:focus-visible {
+  outline: 2px solid #fda103;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Gentle lift on the feature / service cards (hover only — no reflow) */
+.elementor-widget-icon-box .elementor-icon-box-wrapper,
+.elementor-widget-image-box .elementor-image-box-wrapper,
+.elementor-widget-icon-box,
+.elementor-widget-image-box {
+  transition: transform .28s ease, box-shadow .28s ease;
+}
+.elementor-widget-icon-box:hover .elementor-icon-box-wrapper,
+.elementor-widget-image-box:hover .elementor-image-box-wrapper {
+  transform: translateY(-5px);
+}
+
+/* Smoother, slightly livelier buttons */
+.elementor-button {
+  transition: transform .15s ease, box-shadow .22s ease, background-color .22s ease, color .22s ease;
+}
+.elementor-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(253, 161, 3, 0.28);
+}
+
+/* Client logos: subtle zoom on hover */
+.elementor-image-carousel img,
+.swiper-slide img {
+  transition: transform .3s ease;
+}
+.elementor-image-carousel img:hover,
+.swiper-slide img:hover {
+  transform: scale(1.06);
+}
+
+/* Images render a touch crisper when scaled */
+img { image-rendering: auto; }
