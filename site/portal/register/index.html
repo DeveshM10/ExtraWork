@@ -2,93 +2,18 @@
 <html lang="en-US">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Create Account — Print Media Online</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Client Login — Print Media Online</title>
   <meta name="robots" content="noindex">
+  <meta http-equiv="refresh" content="0; url=/portal/login/">
   <link rel="stylesheet" href="/portal/assets/portal.css">
 </head>
 <body>
-  <header class="pmo-topbar">
-    <a href="/"><img src="/wp-content/uploads/2021/10/logo-N-600x96.png" alt="Print Media Online"></a>
-    <a class="home-link" href="/">← Back to site</a>
-  </header>
-
-  <main class="auth-wrap">
-    <form class="auth-card" id="reg-form" novalidate>
-      <h1>Create Account</h1>
-      <p class="sub">Set up a client account to place and follow print orders.</p>
-
-      <div class="msg" id="msg" role="alert"></div>
-
-      <div class="row2">
-        <div class="field">
-          <label for="name">Full name</label>
-          <input id="name" name="name" type="text" autocomplete="name" required autofocus>
-        </div>
-        <div class="field">
-          <label for="company">Company <span style="font-weight:400;color:#9aa0ab">(optional)</span></label>
-          <input id="company" name="company" type="text" autocomplete="organization">
-        </div>
-      </div>
-      <div class="field">
-        <label for="username">Username</label>
-        <input id="username" name="username" type="text" autocomplete="username" required>
-        <div class="hint">3–32 characters — letters, numbers, . _ - only.</div>
-      </div>
-      <div class="field">
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" autocomplete="email" required>
-      </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <input id="password" name="password" type="password" autocomplete="new-password" required>
-        <div class="hint">At least 8 characters.</div>
-      </div>
-
-      <button class="btn" type="submit">Create Account</button>
-
-      <div class="auth-alt">
-        Already have an account? <a href="/portal/login/">Sign in</a>
-      </div>
-    </form>
-  </main>
-
-  <footer class="pmo-foot">© Print Media Online · +1 (732) 993-5043 · order@printmediaonline.com</footer>
-
-  <script src="/portal/assets/portal.js"></script>
-  <script>
-    (async function () {
-      if (await Portal.me()) { location.replace('/portal/dashboard/'); return; }
-
-      var form = document.getElementById('reg-form');
-      var msg = document.getElementById('msg');
-      form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        Portal.hideMsg(msg);
-        var btn = form.querySelector('button');
-        var body = {
-          name: form.name.value.trim(),
-          company: form.company.value.trim(),
-          username: form.username.value.trim(),
-          email: form.email.value.trim(),
-          password: form.password.value,
-        };
-        if (!body.name || !body.username || !body.email || !body.password) {
-          Portal.showMsg(msg, 'Please fill in all required fields.', 'err'); return;
-        }
-        if (body.password.length < 8) {
-          Portal.showMsg(msg, 'Password must be at least 8 characters.', 'err'); return;
-        }
-        Portal.busy(btn, true, 'Creating account…');
-        var r = await Portal.post('/api/auth/register', body);
-        Portal.busy(btn, false);
-        if (r.ok && r.data.ok) {
-          location.href = '/portal/dashboard/';
-        } else {
-          Portal.showMsg(msg, (r.data && r.data.message) || 'Could not create the account.', 'err');
-        }
-      });
-    })();
-  </script>
+  <!-- Self-signup has been removed. Accounts are provisioned by Print Media
+       Online. This page now redirects to the login screen. -->
+  <div class="center-load">
+    Redirecting to sign in… <a href="/portal/login/" style="margin-left:6px">Continue</a>
+  </div>
+  <script>location.replace('/portal/login/');</script>
 </body>
 </html>

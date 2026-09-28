@@ -151,7 +151,7 @@ overflow-x:hidden;
 		</div>
 							</div>
 		</section>
-				<section class="elementor-section elementor-top-section elementor-element elementor-element-a302e60 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="a302e60" data-element_type="section" data-settings="{&quot;display_condition_enable&quot;:&quot;yes&quot;,&quot;_ha_eqh_enable&quot;:false}">
+				<section class="elementor-section elementor-top-section elementor-element elementor-element-a302e60 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="a302e60" data-element_type="section" data-portal-form="tcs" style="display:none" data-settings="{&quot;display_condition_enable&quot;:&quot;yes&quot;,&quot;_ha_eqh_enable&quot;:false}">
 						<div class="elementor-container elementor-column-gap-default">
 					<div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-e2a1f7f" data-id="e2a1f7f" data-element_type="column">
 			<div class="elementor-widget-wrap elementor-element-populated">
@@ -310,7 +310,7 @@ overflow-x:hidden;
 		</div>
 							</div>
 		</section>
-				<section class="elementor-section elementor-top-section elementor-element elementor-element-1e5b4b8 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="1e5b4b8" data-element_type="section" data-settings="{&quot;display_condition_enable&quot;:&quot;yes&quot;,&quot;_ha_eqh_enable&quot;:&quot;yes&quot;,&quot;_ha_eqh_to&quot;:&quot;widget&quot;,&quot;_ha_eqh_disable_on_tablet&quot;:&quot;no&quot;,&quot;_ha_eqh_disable_on_mobile&quot;:&quot;yes&quot;}">
+				<section class="elementor-section elementor-top-section elementor-element elementor-element-1e5b4b8 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="1e5b4b8" data-element_type="section" data-portal-form="digitate" style="display:none" data-settings="{&quot;display_condition_enable&quot;:&quot;yes&quot;,&quot;_ha_eqh_enable&quot;:&quot;yes&quot;,&quot;_ha_eqh_to&quot;:&quot;widget&quot;,&quot;_ha_eqh_disable_on_tablet&quot;:&quot;no&quot;,&quot;_ha_eqh_disable_on_mobile&quot;:&quot;yes&quot;}">
 						<div class="elementor-container elementor-column-gap-default">
 					<div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-4276318" data-id="4276318" data-element_type="column">
 			<div class="elementor-widget-wrap elementor-element-populated">
@@ -1012,6 +1012,34 @@ var wpformsElementorVars = {"captcha_provider":"recaptcha","recaptcha_type":"v2"
 //# sourceURL=wpforms-elementor-js-extra
 </script>
 <script src="../wp-content/plugins/wpforms/assets/js/integrations/elementor/frontend.min.js" id="wpforms-elementor-js"></script>
+<!-- Client-portal gate: the TCS / Digitate request forms are for signed-in
+     client accounts only. Not signed in -> redirect to login. Signed in ->
+     reveal only this account's form and remove the other client's form from
+     the page. (Server-side enforcement is added when form submission is wired.) -->
+<script>
+(function () {
+  var sections = document.querySelectorAll('[data-portal-form]');
+  fetch('/api/auth/me', { credentials: 'same-origin', headers: { Accept: 'application/json' } })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      var user = (d && d.authenticated) ? d.user : null;
+      if (!user) { location.replace('/portal/login/?next=' + encodeURIComponent(location.pathname)); return; }
+      var shown = false;
+      sections.forEach(function (sec) {
+        if (sec.getAttribute('data-portal-form') === user.client) { sec.style.display = ''; shown = true; }
+        else { sec.remove(); }
+      });
+      if (!shown) {
+        var n = document.createElement('div');
+        n.style.cssText = 'max-width:680px;margin:48px auto;padding:22px;border:1px dashed #e4e7ec;border-radius:10px;font-family:Roboto,Arial,sans-serif;color:#6b7280;text-align:center;font-size:15px';
+        n.innerHTML = 'Your account does not have a request form assigned yet. Please <a href="/contact-us/">contact us</a>.';
+        var host = document.querySelector('.page-content') || document.body;
+        host.insertBefore(n, host.firstChild);
+      }
+    })
+    .catch(function () { location.replace('/portal/login/'); });
+})();
+</script>
 <!-- static contact-form handler - configure endpoint in assets/js/form-handler.js -->
 <script src="../assets/js/form-handler.js"></script>
 </body>

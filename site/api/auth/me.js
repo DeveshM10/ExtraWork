@@ -18,7 +18,10 @@ module.exports = async (req, res) => {
     return res.end(JSON.stringify({
       ok: true,
       authenticated: true,
-      user: { username: user.username, name: user.name, email: user.email, company: user.company },
+      user: {
+        username: user.username, name: user.name, email: user.email,
+        company: user.company, client: user.client || null, role: user.role || 'client',
+      },
     }));
   } catch (err) {
     console.error('[me]', err.message);

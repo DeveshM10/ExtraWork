@@ -32,7 +32,10 @@ module.exports = async (req, res) => {
     res.setHeader('Set-Cookie', sessionCookie(token));
     return json(res, 200, {
       ok: true,
-      user: { username: user.username, name: user.name, email: user.email, company: user.company },
+      user: {
+        username: user.username, name: user.name, email: user.email,
+        company: user.company, client: user.client || null, role: user.role || 'client',
+      },
     });
   } catch (err) {
     console.error('[login]', err.message);

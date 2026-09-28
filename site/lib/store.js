@@ -31,19 +31,25 @@ function pool() {
   return _pool;
 }
 
-function ensureSchema() {
+async function ensureSchema() {
   if (_ready) return _ready;
-  _ready = pool().query(`
-    CREATE TABLE IF NOT EXISTS portal_users (
-      id         TEXT PRIMARY KEY,
-      username   TEXT UNIQUE NOT NULL,
-      email      TEXT UNIQUE NOT NULL,
-      name       TEXT NOT NULL,
-      company    TEXT,
-      pass_hash  TEXT NOT NULL,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    );
-  `);
+  _ready = (async () => {
+    await pool().query(`
+      CREATE TABLE IF NOT EXISTS portal_users (
+        id         TEXT PRIMARY KEY,
+        username   TEXT UNIQUE NOT NULL,
+        email      TEXT UNIQUE NOT NULL,
+        name       TEXT NOT NULL,
+        company    TEXT,
+        pass_hash  TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+    `);
+    // client = which client's data this account may see ('tcs' | 'digitate' | null)
+    // role   = 'client' (a normal client account) | 'admin'
+    await pool().query(`ALTER TABLE portal_users ADD COLUMN IF NOT EXISTS client TEXT;`);
+    await pool().query(`ALTER TABLE portal_users ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'client';`);
+  })();
   return _ready;
 }
 
@@ -66,9 +72,9 @@ const pg = {
   async createUser(u) {
     await ensureSchema();
     const r = await pool().query(
-      `INSERT INTO portal_users (id, username, email, name, company, pass_hash)
-       VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-      [u.id, u.username, u.email, u.name, u.company || null, u.pass_hash]
+      `INSERT INTO portal_users (id, username, email, name, company, pass_hash, client, role)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
+      [u.id, u.username, u.email, u.name, u.company || null, u.pass_hash, u.client || null, u.role || 'client']
     );
     return r.rows[0];
   },

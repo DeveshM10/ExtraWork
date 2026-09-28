@@ -34,7 +34,7 @@ async function verifyPassword(plain, hash) {
 
 function issueToken(user) {
   return jwt.sign(
-    { sub: user.id, username: user.username, name: user.name },
+    { sub: user.id, username: user.username, name: user.name, client: user.client || null, role: user.role || 'client' },
     secret(),
     { expiresIn: MAX_AGE }
   );

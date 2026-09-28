@@ -32,7 +32,8 @@
       <button class="btn" type="submit">Sign In</button>
 
       <div class="auth-alt">
-        New client? <a href="/portal/register/">Create an account</a>
+        Accounts are issued by Print Media Online.<br>
+        Need access for your team? <a href="/contact-us/">Contact us</a>.
       </div>
     </form>
   </main>
@@ -42,8 +43,14 @@
   <script src="/portal/assets/portal.js"></script>
   <script>
     (async function () {
-      // Already signed in? Go straight to the dashboard.
-      if (await Portal.me()) { location.replace('/portal/dashboard/'); return; }
+      // Where to go after login: a safe same-site ?next=, else the dashboard.
+      function dest() {
+        var n = new URLSearchParams(location.search).get('next') || '';
+        return (/^\/[^/]/.test(n) && !n.startsWith('//')) ? n : '/portal/dashboard/';
+      }
+
+      // Already signed in? Go straight through.
+      if (await Portal.me()) { location.replace(dest()); return; }
 
       var form = document.getElementById('login-form');
       var msg = document.getElementById('msg');
@@ -62,7 +69,7 @@
         var r = await Portal.post('/api/auth/login', body);
         Portal.busy(btn, false);
         if (r.ok && r.data.ok) {
-          location.href = '/portal/dashboard/';
+          location.href = dest();
         } else {
           Portal.showMsg(msg, (r.data && r.data.message) || 'Sign-in failed. Please try again.', 'err');
         }

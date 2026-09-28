@@ -113,27 +113,46 @@
       if (!user) { location.replace('/portal/login/'); return; }
 
       // Header + account
+      var CLIENT_LABEL = { tcs: 'TCS', digitate: 'Digitate' };
+      var clientName = CLIENT_LABEL[user.client] || user.company || '';
       document.getElementById('greeting').textContent = 'Welcome, ' + (user.name || user.username).split(' ')[0];
-      document.getElementById('who').textContent = (user.company ? user.company + ' · ' : '') + '@' + user.username;
+      document.getElementById('who').innerHTML =
+        (clientName ? '<strong>' + clientName + '</strong> client portal · ' : '') + '@' + user.username;
       document.getElementById('acc-name').textContent = user.name || '—';
       document.getElementById('acc-username').textContent = user.username;
       document.getElementById('acc-email').textContent = user.email;
       document.getElementById('acc-company').textContent = user.company || '—';
 
-      // --- Order + proof data ---------------------------------------------
-      // These render from the arrays below. Wire them to a real endpoint
-      // (e.g. GET /api/orders for the signed-in user) to go live; leave the
-      // arrays empty and the panels show their empty state automatically.
-      var orders = [
-        { id: 'PMO-1042', desc: 'Business Cards — Matte, 500', date: 'Sep 22, 2026', status: 'printing', total: '$89.00' },
-        { id: 'PMO-1039', desc: 'A5 Flyers — Gloss, 1,000',   date: 'Sep 18, 2026', status: 'review',   total: '$210.00' },
-        { id: 'PMO-1031', desc: 'Roll-up Banner 33"×80"',      date: 'Sep 09, 2026', status: 'shipped',  total: '$145.00' },
-        { id: 'PMO-1024', desc: 'Letterhead — 24lb, 250',      date: 'Aug 30, 2026', status: 'done',     total: '$64.00' }
-      ];
-      var proofs = [
-        { title: 'A5 Flyers — Gloss', desc: 'Proof v2 · uploaded Sep 19', tag: 'FLYER' },
-        { title: 'Business Cards', desc: 'Proof v1 · uploaded Sep 21', tag: 'CARD' }
-      ];
+      // --- Order + proof data (scoped to this account's client) -----------
+      // Each account is tied to one client (user.client). A TCS account only
+      // ever sees TCS data; a Digitate account only sees Digitate data. This
+      // is sample data keyed by client — replace with GET /api/orders once real
+      // orders are wired, and enforce the same client scope on the server.
+      var DATA = {
+        tcs: {
+          orders: [
+            { id: 'TCS-1042', desc: 'Business Cards — Matte, 500', date: 'Sep 22, 2026', status: 'printing', total: '—' },
+            { id: 'TCS-1039', desc: 'Letterhead — 24lb, 1,000',    date: 'Sep 18, 2026', status: 'review',   total: '—' },
+            { id: 'TCS-1031', desc: 'Envelopes — DL, 2,000',       date: 'Sep 09, 2026', status: 'shipped',  total: '—' }
+          ],
+          proofs: [
+            { title: 'Business Cards', desc: 'Proof v2 · uploaded Sep 21', tag: 'CARD' },
+            { title: 'Letterhead', desc: 'Proof v1 · uploaded Sep 19', tag: 'LETTER' }
+          ]
+        },
+        digitate: {
+          orders: [
+            { id: 'DGT-2050', desc: 'Business Cards — Matte, 250', date: 'Sep 24, 2026', status: 'printing', total: '—' },
+            { id: 'DGT-2044', desc: 'Business Cards — Matte, 500', date: 'Sep 15, 2026', status: 'done',     total: '—' }
+          ],
+          proofs: [
+            { title: 'Business Cards', desc: 'Proof v1 · uploaded Sep 23', tag: 'CARD' }
+          ]
+        }
+      };
+      var scoped = DATA[user.client] || { orders: [], proofs: [] };
+      var orders = scoped.orders;
+      var proofs = scoped.proofs;
 
       var STATUS_LABEL = { printing: 'Printing', review: 'In Review', shipped: 'Shipped', done: 'Completed', pending: 'Pending' };
 
