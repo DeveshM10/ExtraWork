@@ -49,6 +49,34 @@ async function ensureSchema() {
     // role   = 'client' (a normal client account) | 'admin'
     await pool().query(`ALTER TABLE portal_users ADD COLUMN IF NOT EXISTS client TEXT;`);
     await pool().query(`ALTER TABLE portal_users ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'client';`);
+
+    // Per-client business data. Every row belongs to exactly one client and is
+    // only ever returned to a session whose account carries that client.
+    await pool().query(`
+      CREATE TABLE IF NOT EXISTS portal_orders (
+        id          TEXT PRIMARY KEY,
+        client      TEXT NOT NULL,
+        order_ref   TEXT NOT NULL,
+        description TEXT NOT NULL,
+        quantity    TEXT,
+        status      TEXT NOT NULL DEFAULT 'pending',
+        total       TEXT,
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+    `);
+    await pool().query(`CREATE INDEX IF NOT EXISTS portal_orders_client_idx ON portal_orders (client);`);
+    await pool().query(`
+      CREATE TABLE IF NOT EXISTS portal_proofs (
+        id          TEXT PRIMARY KEY,
+        client      TEXT NOT NULL,
+        title       TEXT NOT NULL,
+        note        TEXT,
+        tag         TEXT,
+        status      TEXT NOT NULL DEFAULT 'pending',
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+    `);
+    await pool().query(`CREATE INDEX IF NOT EXISTS portal_proofs_client_idx ON portal_proofs (client);`);
   })();
   return _ready;
 }
@@ -78,6 +106,36 @@ const pg = {
     );
     return r.rows[0];
   },
+  async listOrders(client) {
+    await ensureSchema();
+    if (!client) return [];
+    const r = await pool().query('SELECT * FROM portal_orders WHERE client=$1 ORDER BY created_at DESC', [client]);
+    return r.rows;
+  },
+  async listProofs(client) {
+    await ensureSchema();
+    if (!client) return [];
+    const r = await pool().query('SELECT * FROM portal_proofs WHERE client=$1 ORDER BY created_at DESC', [client]);
+    return r.rows;
+  },
+  async createOrder(o) {
+    await ensureSchema();
+    const r = await pool().query(
+      `INSERT INTO portal_orders (id,client,order_ref,description,quantity,status,total)
+       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+      [o.id, o.client, o.order_ref, o.description, o.quantity || null, o.status || 'pending', o.total || null]
+    );
+    return r.rows[0];
+  },
+  async createProof(p) {
+    await ensureSchema();
+    const r = await pool().query(
+      `INSERT INTO portal_proofs (id,client,title,note,tag,status)
+       VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
+      [p.id, p.client, p.title, p.note || null, p.tag || null, p.status || 'pending']
+    );
+    return r.rows[0];
+  },
 };
 
 /* ------------------------------ File (dev) ------------------------------- */
@@ -88,8 +146,11 @@ const os = require('os');
 const FILE = path.join(os.tmpdir(), 'pmo-portal-users.json');
 
 function readFile() {
-  try { return JSON.parse(fs.readFileSync(FILE, 'utf8')); }
-  catch (_) { return { users: [] }; }
+  try {
+    const db = JSON.parse(fs.readFileSync(FILE, 'utf8'));
+    db.users = db.users || []; db.orders = db.orders || []; db.proofs = db.proofs || [];
+    return db;
+  } catch (_) { return { users: [], orders: [], proofs: [] }; }
 }
 function writeFile(db) {
   fs.writeFileSync(FILE, JSON.stringify(db, null, 2));
@@ -110,6 +171,20 @@ const file = {
     db.users.push(u);
     writeFile(db);
     return u;
+  },
+  async listOrders(client) {
+    if (!client) return [];
+    return readFile().orders.filter((o) => o.client === client);
+  },
+  async listProofs(client) {
+    if (!client) return [];
+    return readFile().proofs.filter((p) => p.client === client);
+  },
+  async createOrder(o) {
+    const db = readFile(); db.orders.push(o); writeFile(db); return o;
+  },
+  async createProof(p) {
+    const db = readFile(); db.proofs.push(p); writeFile(db); return p;
   },
 };
 

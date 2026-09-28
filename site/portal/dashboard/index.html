@@ -123,44 +123,38 @@
       document.getElementById('acc-email').textContent = user.email;
       document.getElementById('acc-company').textContent = user.company || '—';
 
-      // --- Order + proof data (scoped to this account's client) -----------
-      // Each account is tied to one client (user.client). A TCS account only
-      // ever sees TCS data; a Digitate account only sees Digitate data. This
-      // is sample data keyed by client — replace with GET /api/orders once real
-      // orders are wired, and enforce the same client scope on the server.
-      var DATA = {
-        tcs: {
-          orders: [
-            { id: 'TCS-1042', desc: 'Business Cards — Matte, 500', date: 'Sep 22, 2026', status: 'printing', total: '—' },
-            { id: 'TCS-1039', desc: 'Letterhead — 24lb, 1,000',    date: 'Sep 18, 2026', status: 'review',   total: '—' },
-            { id: 'TCS-1031', desc: 'Envelopes — DL, 2,000',       date: 'Sep 09, 2026', status: 'shipped',  total: '—' }
-          ],
-          proofs: [
-            { title: 'Business Cards', desc: 'Proof v2 · uploaded Sep 21', tag: 'CARD' },
-            { title: 'Letterhead', desc: 'Proof v1 · uploaded Sep 19', tag: 'LETTER' }
-          ]
-        },
-        digitate: {
-          orders: [
-            { id: 'DGT-2050', desc: 'Business Cards — Matte, 250', date: 'Sep 24, 2026', status: 'printing', total: '—' },
-            { id: 'DGT-2044', desc: 'Business Cards — Matte, 500', date: 'Sep 15, 2026', status: 'done',     total: '—' }
-          ],
-          proofs: [
-            { title: 'Business Cards', desc: 'Proof v1 · uploaded Sep 23', tag: 'CARD' }
-          ]
-        }
-      };
-      var scoped = DATA[user.client] || { orders: [], proofs: [] };
-      var orders = scoped.orders;
-      var proofs = scoped.proofs;
-
+      // --- Dashboard data: fetched per session from the server ------------
+      // The page holds NO order data of its own. /api/orders reads the session
+      // cookie, resolves this account's client on the server, and returns only
+      // that client's rows — so every account sees its own data, enforced
+      // server-side. Nothing here is shared or hardcoded.
       var STATUS_LABEL = { printing: 'Printing', review: 'In Review', shipped: 'Shipped', done: 'Completed', pending: 'Pending' };
 
-      // Stats derived from the data
-      document.getElementById('s-active').textContent = orders.filter(function (o) { return o.status === 'printing'; }).length;
-      document.getElementById('s-proofs').textContent = proofs.length;
-      document.getElementById('s-done').textContent = orders.filter(function (o) { return o.status === 'done' || o.status === 'shipped'; }).length;
-      document.getElementById('s-files').textContent = proofs.length + 3;
+      function fmtDate(iso) {
+        if (!iso) return '';
+        var d = new Date(iso);
+        return isNaN(d) ? '' : d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+      }
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+      }
+
+      var data = { stats: {}, orders: [], proofs: [] };
+      try {
+        var res = await fetch('/api/orders', { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+        if (res.ok) { var j = await res.json(); if (j && j.ok) data = j; }
+      } catch (_) { /* fall through to empty state */ }
+
+      var orders = data.orders || [];
+      var proofs = data.proofs || [];
+      var stats = data.stats || {};
+
+      document.getElementById('s-active').textContent = stats.active || 0;
+      document.getElementById('s-proofs').textContent = stats.review || 0;
+      document.getElementById('s-done').textContent = stats.completed || 0;
+      document.getElementById('s-files').textContent = stats.files || 0;
 
       // Orders table
       var tb = document.getElementById('orders-body');
@@ -170,11 +164,11 @@
         orders.forEach(function (o) {
           var tr = document.createElement('tr');
           tr.innerHTML =
-            '<td class="oid">' + o.id + '</td>' +
-            '<td>' + o.desc + '</td>' +
-            '<td class="meta">' + o.date + '</td>' +
-            '<td><span class="badge ' + o.status + '">' + (STATUS_LABEL[o.status] || o.status) + '</span></td>' +
-            '<td>' + o.total + '</td>' +
+            '<td class="oid">' + esc(o.order_ref) + '</td>' +
+            '<td>' + esc(o.description) + '</td>' +
+            '<td class="meta">' + esc(fmtDate(o.created_at)) + '</td>' +
+            '<td><span class="badge ' + esc(o.status) + '">' + esc(STATUS_LABEL[o.status] || o.status) + '</span></td>' +
+            '<td>' + esc(o.total || '—') + '</td>' +
             '<td><span class="link">View</span></td>';
           tb.appendChild(tr);
         });
@@ -189,8 +183,8 @@
           var d = document.createElement('div');
           d.className = 'proof';
           d.innerHTML =
-            '<div class="thumb">' + p.tag + '</div>' +
-            '<div class="pbody"><div class="pt">' + p.title + '</div><div class="pd">' + p.desc + '</div>' +
+            '<div class="thumb">' + esc(p.tag || 'PROOF') + '</div>' +
+            '<div class="pbody"><div class="pt">' + esc(p.title) + '</div><div class="pd">' + esc(p.note || '') + '</div>' +
             '<div class="pact"><button class="btn-sm approve">Approve</button><button class="btn-sm changes">Changes</button></div></div>';
           pg.appendChild(d);
         });
