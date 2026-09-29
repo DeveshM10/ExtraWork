@@ -29,21 +29,22 @@ module.exports = async (req, res) => {
     }
 
     const client = user.client || null;
-    const [orders, proofs] = await Promise.all([
+    const [orders, proofs, files, invoices] = await Promise.all([
       store.listOrders(client),
       store.listProofs(client),
+      store.listFiles(client),
+      store.listInvoices(client),
     ]);
 
-    const filesOnRecord = orders.length + proofs.length;
     const stats = {
       active: orders.filter((o) => o.status === 'printing').length,
-      review: proofs.length,
+      review: proofs.filter((p) => p.status === 'pending' || !p.status).length,
       completed: orders.filter((o) => o.status === 'done' || o.status === 'shipped').length,
-      files: filesOnRecord,
+      files: files.length,
     };
 
     res.statusCode = 200;
-    return res.end(JSON.stringify({ ok: true, client, stats, orders, proofs }));
+    return res.end(JSON.stringify({ ok: true, client, stats, orders, proofs, files, invoices }));
   } catch (err) {
     console.error('[orders]', err.message);
     res.statusCode = 500;

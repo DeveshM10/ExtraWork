@@ -77,6 +77,35 @@ async function ensureSchema() {
       );
     `);
     await pool().query(`CREATE INDEX IF NOT EXISTS portal_proofs_client_idx ON portal_proofs (client);`);
+    // A client's decision on a proof: status becomes 'approved' or
+    // 'changes_requested', with their feedback and when they decided.
+    await pool().query(`ALTER TABLE portal_proofs ADD COLUMN IF NOT EXISTS feedback TEXT;`);
+    await pool().query(`ALTER TABLE portal_proofs ADD COLUMN IF NOT EXISTS decided_at TIMESTAMPTZ;`);
+
+    await pool().query(`
+      CREATE TABLE IF NOT EXISTS portal_files (
+        id          TEXT PRIMARY KEY,
+        client      TEXT NOT NULL,
+        name        TEXT NOT NULL,
+        kind        TEXT,
+        size        TEXT,
+        url         TEXT,
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+    `);
+    await pool().query(`CREATE INDEX IF NOT EXISTS portal_files_client_idx ON portal_files (client);`);
+    await pool().query(`
+      CREATE TABLE IF NOT EXISTS portal_invoices (
+        id          TEXT PRIMARY KEY,
+        client      TEXT NOT NULL,
+        invoice_ref TEXT NOT NULL,
+        order_ref   TEXT,
+        amount      TEXT,
+        status      TEXT NOT NULL DEFAULT 'unpaid',
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+    `);
+    await pool().query(`CREATE INDEX IF NOT EXISTS portal_invoices_client_idx ON portal_invoices (client);`);
   })();
   return _ready;
 }
@@ -136,6 +165,40 @@ const pg = {
     );
     return r.rows[0];
   },
+  async findOrder(orderRef, client) {
+    await ensureSchema();
+    if (!client) return null;
+    const r = await pool().query(
+      'SELECT * FROM portal_orders WHERE order_ref=$1 AND client=$2 LIMIT 1',
+      [orderRef, client]
+    );
+    return r.rows[0] || null;
+  },
+  async listFiles(client) {
+    await ensureSchema();
+    if (!client) return [];
+    const r = await pool().query('SELECT * FROM portal_files WHERE client=$1 ORDER BY created_at DESC', [client]);
+    return r.rows;
+  },
+  async listInvoices(client) {
+    await ensureSchema();
+    if (!client) return [];
+    const r = await pool().query('SELECT * FROM portal_invoices WHERE client=$1 ORDER BY created_at DESC', [client]);
+    return r.rows;
+  },
+  async decideProof(id, client, status, feedback) {
+    await ensureSchema();
+    if (!id || !client) return null;
+    // Only pending proofs of THIS client can be decided.
+    const r = await pool().query(
+      `UPDATE portal_proofs
+          SET status=$3, feedback=$4, decided_at=now()
+        WHERE id=$1 AND client=$2 AND status='pending'
+        RETURNING *`,
+      [id, client, status, feedback]
+    );
+    return r.rows[0] || null;
+  },
 };
 
 /* ------------------------------ File (dev) ------------------------------- */
@@ -148,9 +211,13 @@ const FILE = path.join(os.tmpdir(), 'pmo-portal-users.json');
 function readFile() {
   try {
     const db = JSON.parse(fs.readFileSync(FILE, 'utf8'));
-    db.users = db.users || []; db.orders = db.orders || []; db.proofs = db.proofs || [];
+    db.users = db.users || [];
+    db.orders = db.orders || [];
+    db.proofs = db.proofs || [];
+    db.files = db.files || [];
+    db.invoices = db.invoices || [];
     return db;
-  } catch (_) { return { users: [], orders: [], proofs: [] }; }
+  } catch (_) { return { users: [], orders: [], proofs: [], files: [], invoices: [] }; }
 }
 function writeFile(db) {
   fs.writeFileSync(FILE, JSON.stringify(db, null, 2));
@@ -185,6 +252,28 @@ const file = {
   },
   async createProof(p) {
     const db = readFile(); db.proofs.push(p); writeFile(db); return p;
+  },
+  async findOrder(orderRef, client) {
+    if (!client) return null;
+    return readFile().orders.find((o) => o.order_ref === orderRef && o.client === client) || null;
+  },
+  async listFiles(client) {
+    if (!client) return [];
+    return readFile().files.filter((f) => f.client === client);
+  },
+  async listInvoices(client) {
+    if (!client) return [];
+    return readFile().invoices.filter((i) => i.client === client);
+  },
+  async decideProof(id, client, status, feedback) {
+    const db = readFile();
+    const p = db.proofs.find((x) => x.id === id && x.client === client && x.status === 'pending');
+    if (!p) return null;
+    p.status = status;
+    p.feedback = feedback;
+    p.decided_at = new Date().toISOString();
+    writeFile(db);
+    return p;
   },
 };
 

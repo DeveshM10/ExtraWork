@@ -19,11 +19,11 @@
     <!-- sidebar -->
     <nav class="sidebar">
       <div class="side-label">Menu</div>
-      <a class="active" href="#"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg> Dashboard</a>
-      <a href="/forms/"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg> My Orders</a>
+      <a class="active" href="#top"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg> Dashboard</a>
+      <a href="#orders"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg> My Orders</a>
       <a href="#proofs"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg> Proofs</a>
-      <a href="#"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7"/></svg> Files</a>
-      <a href="#"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg> Invoices</a>
+      <a href="#files"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7"/></svg> Files</a>
+      <a href="#invoices"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg> Invoices</a>
       <a href="#account"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg> Account</a>
       <div class="spacer"></div>
       <a class="side-logout" id="logout" href="#"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 17l5-5-5-5M21 12H9M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg> Sign out</a>
@@ -31,15 +31,17 @@
 
     <!-- mobile nav -->
     <nav class="mobile-nav">
-      <a class="active" href="#">Dashboard</a>
-      <a href="/forms/">Orders</a>
+      <a class="active" href="#top">Dashboard</a>
+      <a href="#orders">Orders</a>
       <a href="#proofs">Proofs</a>
+      <a href="#files">Files</a>
+      <a href="#invoices">Invoices</a>
       <a href="#account">Account</a>
       <a href="#" id="logout-m">Sign out</a>
     </nav>
 
     <!-- content -->
-    <main class="content">
+    <main class="content" id="top">
       <div class="content-head">
         <div>
           <h1 id="greeting">Welcome</h1>
@@ -67,15 +69,15 @@
         </div>
       </section>
 
-      <section class="panel">
-        <h2>Recent Orders</h2>
+      <section class="panel" id="orders">
+        <h2>My Orders</h2>
         <div class="table-wrap">
           <table class="orders">
             <thead><tr><th>Order</th><th>Description</th><th>Date</th><th>Status</th><th>Total</th><th></th></tr></thead>
             <tbody id="orders-body"></tbody>
           </table>
         </div>
-        <div id="orders-empty" class="empty-note" hidden>No orders yet — start one with a print request and it'll show up here.</div>
+        <div id="orders-empty" class="empty-note" hidden>No orders yet — start one with <a href="/forms/">a new print request</a> and it'll show up here.</div>
       </section>
 
       <section class="panel" id="proofs">
@@ -84,13 +86,39 @@
         <div id="proofs-empty" class="empty-note" hidden>No proofs waiting on you right now.</div>
       </section>
 
+      <section class="panel" id="files">
+        <h2>Files</h2>
+        <div class="table-wrap">
+          <table class="orders">
+            <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Uploaded</th><th></th></tr></thead>
+            <tbody id="files-body"></tbody>
+          </table>
+        </div>
+        <div id="files-empty" class="empty-note" hidden>
+          No files on record yet. To send artwork, email
+          <a href="mailto:order@printmediaonline.com?subject=Artwork%20upload%20%E2%80%94%20client%20portal">order@printmediaonline.com</a>
+          and our team will attach it to your account here.
+        </div>
+      </section>
+
+      <section class="panel" id="invoices">
+        <h2>Invoices</h2>
+        <div class="table-wrap">
+          <table class="orders">
+            <thead><tr><th>Invoice</th><th>Order</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody id="invoices-body"></tbody>
+          </table>
+        </div>
+        <div id="invoices-empty" class="empty-note" hidden>No invoices yet. You'll see billing here once an order is invoiced.</div>
+      </section>
+
       <section class="panel">
         <h2>Quick Actions</h2>
         <div class="quick">
           <a href="/forms/">New print request</a>
           <a href="/services/">Browse services</a>
           <a href="/contact-us/">Get a quote</a>
-          <a href="#">Upload artwork</a>
+          <a href="#files">Send artwork</a>
         </div>
       </section>
 
@@ -141,7 +169,7 @@
         });
       }
 
-      var data = { stats: {}, orders: [], proofs: [] };
+      var data = { stats: {}, orders: [], proofs: [], files: [], invoices: [] };
       try {
         var res = await fetch('/api/orders', { credentials: 'same-origin', headers: { Accept: 'application/json' } });
         if (res.ok) { var j = await res.json(); if (j && j.ok) data = j; }
@@ -149,6 +177,8 @@
 
       var orders = data.orders || [];
       var proofs = data.proofs || [];
+      var files = data.files || [];
+      var invoices = data.invoices || [];
       var stats = data.stats || {};
 
       document.getElementById('s-active').textContent = stats.active || 0;
@@ -156,7 +186,7 @@
       document.getElementById('s-done').textContent = stats.completed || 0;
       document.getElementById('s-files').textContent = stats.files || 0;
 
-      // Orders table
+      // Orders table + expandable detail row
       var tb = document.getElementById('orders-body');
       if (!orders.length) {
         document.getElementById('orders-empty').hidden = false;
@@ -169,12 +199,72 @@
             '<td class="meta">' + esc(fmtDate(o.created_at)) + '</td>' +
             '<td><span class="badge ' + esc(o.status) + '">' + esc(STATUS_LABEL[o.status] || o.status) + '</span></td>' +
             '<td>' + esc(o.total || '—') + '</td>' +
-            '<td><span class="link">View</span></td>';
+            '<td><a class="link" href="#" data-order="' + esc(o.order_ref) + '">View</a></td>';
           tb.appendChild(tr);
+          var det = document.createElement('tr');
+          det.className = 'order-detail';
+          det.hidden = true;
+          det.innerHTML =
+            '<td colspan="6" style="background:#fbfbfc;font-size:13.5px;color:#4b5563;padding:16px 18px">' +
+              '<strong>' + esc(o.order_ref) + '</strong> · ' + esc(o.description) +
+              (o.quantity ? '<br>Quantity: ' + esc(o.quantity) : '') +
+              '<br>Status: ' + esc(STATUS_LABEL[o.status] || o.status) +
+              '<br>Placed on ' + esc(fmtDate(o.created_at)) +
+              '<br><br>Need to update this order? Email ' +
+              '<a href="mailto:order@printmediaonline.com?subject=' + encodeURIComponent('Order ' + o.order_ref) + '">order@printmediaonline.com</a>.' +
+            '</td>';
+          tb.appendChild(det);
+        });
+        // Toggle detail row on View click
+        tb.addEventListener('click', function (e) {
+          var a = e.target.closest('a.link[data-order]');
+          if (!a) return;
+          e.preventDefault();
+          var row = a.closest('tr');
+          var next = row && row.nextElementSibling;
+          if (next && next.classList.contains('order-detail')) next.hidden = !next.hidden;
         });
       }
 
-      // Proofs
+      // Files table
+      var fb = document.getElementById('files-body');
+      if (!files.length) {
+        document.getElementById('files-empty').hidden = false;
+      } else {
+        files.forEach(function (f) {
+          var tr = document.createElement('tr');
+          var nameCell = f.url
+            ? '<a class="link" href="' + esc(f.url) + '" target="_blank" rel="noopener">' + esc(f.name) + '</a>'
+            : esc(f.name);
+          tr.innerHTML =
+            '<td>' + nameCell + '</td>' +
+            '<td class="meta">' + esc(f.kind || '—') + '</td>' +
+            '<td class="meta">' + esc(f.size || '—') + '</td>' +
+            '<td class="meta">' + esc(fmtDate(f.created_at)) + '</td>' +
+            '<td></td>';
+          fb.appendChild(tr);
+        });
+      }
+
+      // Invoices table
+      var ib = document.getElementById('invoices-body');
+      if (!invoices.length) {
+        document.getElementById('invoices-empty').hidden = false;
+      } else {
+        invoices.forEach(function (n) {
+          var tr = document.createElement('tr');
+          tr.innerHTML =
+            '<td class="oid">' + esc(n.invoice_ref) + '</td>' +
+            '<td>' + esc(n.order_ref || '—') + '</td>' +
+            '<td>' + esc(n.amount || '—') + '</td>' +
+            '<td><span class="badge ' + esc(n.status) + '">' + esc(n.status || '—') + '</span></td>' +
+            '<td class="meta">' + esc(fmtDate(n.created_at)) + '</td>';
+          ib.appendChild(tr);
+        });
+      }
+
+      // Proofs — with working Approve / Request Changes
+      var STATUS_TEXT = { approved: 'Approved', changes_requested: 'Changes requested', pending: 'Awaiting your review' };
       var pg = document.getElementById('proofs-grid');
       if (!proofs.length) {
         document.getElementById('proofs-empty').hidden = false;
@@ -182,11 +272,66 @@
         proofs.forEach(function (p) {
           var d = document.createElement('div');
           d.className = 'proof';
+          var actions =
+            (p.status === 'pending' || !p.status)
+              ? '<div class="pact"><button class="btn-sm approve" data-id="' + esc(p.id) + '" data-act="approve">Approve</button>' +
+                '<button class="btn-sm changes" data-id="' + esc(p.id) + '" data-act="changes">Request changes</button></div>'
+              : '<div class="pd" style="margin-top:6px;font-weight:600;color:' +
+                (p.status === 'approved' ? '#1b7f3b' : '#b45309') + '">' + esc(STATUS_TEXT[p.status] || p.status) + '</div>';
           d.innerHTML =
             '<div class="thumb">' + esc(p.tag || 'PROOF') + '</div>' +
-            '<div class="pbody"><div class="pt">' + esc(p.title) + '</div><div class="pd">' + esc(p.note || '') + '</div>' +
-            '<div class="pact"><button class="btn-sm approve">Approve</button><button class="btn-sm changes">Changes</button></div></div>';
+            '<div class="pbody"><div class="pt">' + esc(p.title) + '</div>' +
+            '<div class="pd">' + esc(p.note || '') + '</div>' +
+            (p.feedback ? '<div class="pd" style="margin-top:6px"><em>Your note:</em> ' + esc(p.feedback) + '</div>' : '') +
+            actions + '</div>';
           pg.appendChild(d);
+        });
+
+        // Handle proof decisions
+        pg.addEventListener('click', async function (e) {
+          var btn = e.target.closest('button.btn-sm');
+          if (!btn) return;
+          var id = btn.getAttribute('data-id');
+          var act = btn.getAttribute('data-act');
+          if (!id || !act) return;
+          var feedback = '';
+          if (act === 'changes') {
+            feedback = window.prompt('What changes would you like on this proof?', '') || '';
+            if (!feedback.trim()) return;
+          } else {
+            if (!window.confirm('Approve this proof for printing?')) return;
+          }
+          var siblings = btn.parentElement.querySelectorAll('button');
+          siblings.forEach(function (b) { b.disabled = true; });
+          btn.textContent = 'Saving…';
+          try {
+            var r = await fetch('/api/proofs', {
+              method: 'POST',
+              credentials: 'same-origin',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: id, action: act, feedback: feedback }),
+            });
+            var body = await r.json().catch(function () { return {}; });
+            if (r.ok && body.ok) {
+              // Replace the actions row with a confirmation.
+              var card = btn.closest('.proof');
+              var pact = card.querySelector('.pact');
+              if (pact) {
+                var color = act === 'approve' ? '#1b7f3b' : '#b45309';
+                var text = act === 'approve' ? 'Approved' : 'Changes requested';
+                pact.outerHTML = '<div class="pd" style="margin-top:6px;font-weight:600;color:' + color + '">' + text + '</div>' +
+                  (feedback ? '<div class="pd" style="margin-top:6px"><em>Your note:</em> ' + esc(feedback) + '</div>' : '');
+              }
+            } else {
+              alert(body.message || 'Could not save your decision.');
+              siblings.forEach(function (b) { b.disabled = false; });
+              btn.textContent = act === 'approve' ? 'Approve' : 'Request changes';
+            }
+          } catch (_) {
+            alert('Network error — please try again.');
+            siblings.forEach(function (b) { b.disabled = false; });
+            btn.textContent = act === 'approve' ? 'Approve' : 'Request changes';
+          }
         });
       }
 
