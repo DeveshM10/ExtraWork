@@ -50,3 +50,23 @@ textarea:focus-visible,
 
 /* Images render a touch crisper when scaled */
 img { image-rendering: auto; }
+
+/* Brand logo (The Print Media & Design, LLC).
+   The new mark is ~3.2:1 where the old one was ~6.3:1, so the Elementor widths
+   (535px header / 363px footer / 40% hero) would make it about twice as tall.
+   Size it by height instead; object-fit keeps it from ever distorting. */
+.elementor-element-c221050 img.pmo-logo,
+.elementor-element-0af1c82 img.pmo-logo,
+.elementor-element-7e27697 img.pmo-logo {
+  width: auto !important;
+  max-width: 100%;
+  object-fit: contain;
+}
+.elementor-element-c221050 img.pmo-logo { height: 58px !important; }  /* header */
+.elementor-element-0af1c82 img.pmo-logo { height: 80px !important; }  /* footer */
+.elementor-element-7e27697 img.pmo-logo { height: 64px !important; }  /* homepage hero */
+@media (max-width: 767px) {
+  .elementor-element-c221050 img.pmo-logo { height: 46px !important; }
+  .elementor-element-0af1c82 img.pmo-logo { height: 66px !important; }
+  .elementor-element-7e27697 img.pmo-logo { height: 52px !important; }
+}

@@ -35,16 +35,20 @@ a { color: var(--amber-dark); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 /* ---- top bar ---- */
+/* White bar: the brand logo (dark green + grey type) is built for light
+   backgrounds and loses contrast on the old near-black bar. */
 .pmo-topbar {
-  background: var(--ink);
-  padding: 16px 24px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  padding: 12px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
-.pmo-topbar img { height: 34px; width: auto; display: block; }
-.pmo-topbar .home-link { color: #cfd2d8; font-size: 14px; }
-.pmo-topbar .home-link:hover { color: #fff; text-decoration: none; }
+.pmo-topbar img { height: 48px; width: auto; max-width: 62vw; object-fit: contain; display: block; }
+.pmo-topbar .home-link { color: var(--muted); font-size: 14px; font-weight: 500; white-space: nowrap; }
+.pmo-topbar .home-link:hover { color: var(--amber-dark); text-decoration: none; }
 
 /* ---- auth card ---- */
 .auth-wrap {
@@ -211,6 +215,10 @@ table.orders .oid { font-weight: 700; color: var(--ink); }
 table.orders .link { color: var(--amber-dark); font-weight: 600; cursor: pointer; }
 .badge.pending { background: #f3f4f6; color: #4b5563; }
 .badge.shipped { background: #e0f2fe; color: #0369a1; }
+/* invoice states */
+.badge.paid { background: var(--ok-bg); color: var(--ok); }
+.badge.unpaid { background: #fff3df; color: #a86800; }
+.badge.overdue { background: var(--danger-bg); color: var(--danger); }
 
 /* proofs */
 .proofs { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
@@ -224,21 +232,42 @@ table.orders .link { color: var(--amber-dark); font-weight: 600; cursor: pointer
 .btn-sm.approve { background: var(--amber); border-color: var(--amber); color: #1a1200; }
 .btn-sm.approve:hover { background: var(--amber-dark); }
 .btn-sm.changes:hover { border-color: var(--amber); color: var(--amber-dark); }
+/* Size buttons from their labels so "Request changes" stays on one line. */
+.proof .pact .btn-sm { flex: 1 1 auto; white-space: nowrap; padding: 8px 10px; }
 
 .section-note { font-size: 12.5px; color: var(--muted); background: #fbfbfc; border: 1px dashed var(--line); border-radius: 8px; padding: 10px 13px; margin-top: 4px; }
 
 .mobile-nav { display: none; }
 
 @media (max-width: 860px) {
+  /* Stack the menu bar ABOVE the content. In the default row layout the bar
+     became a full-height column beside the content and pushed it off-screen. */
+  .shell { flex-direction: column; }
   .sidebar { display: none; }
-  .content { padding: 22px 18px 50px; }
+  .content { padding: 22px 18px 50px; width: 100%; }
   .mobile-nav {
-    display: flex; gap: 8px; overflow-x: auto; background: var(--ink); padding: 10px 14px;
+    display: flex; align-items: center; gap: 8px; overflow-x: auto; flex-shrink: 0;
+    background: var(--ink); padding: 10px 14px;
+    position: sticky; top: 0; z-index: 20;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
   }
+  .mobile-nav::-webkit-scrollbar { display: none; }
   .mobile-nav a { color: #cfd2d8; font-size: 13px; white-space: nowrap; padding: 7px 12px; border-radius: 7px; }
   .mobile-nav a.active { background: var(--amber); color: #1a1200; font-weight: 700; }
+  /* Keep section headings clear of the sticky bar when jumping to them. */
+  .panel, .cards, #top { scroll-margin-top: 64px; }
 }
 @media (max-width: 480px) {
   .auth-card { padding: 26px 20px; }
   .row2 { flex-direction: column; gap: 0; }
+  .pmo-topbar { padding: 10px 16px; }
+  .pmo-topbar img { height: 40px; }
+  .content-head h1 { font-size: 21px; }
+  .content-head .btn { width: 100% !important; text-align: center; }
+  .cards { grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+  .stat { padding: 14px 15px; }
+  .stat .v { font-size: 24px; }
+  .stat .k { font-size: 11.5px; }
+  .stat .d { font-size: 12px; }
+  .panel { padding: 18px 16px; }
 }

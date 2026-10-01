@@ -9,7 +9,7 @@
 </head>
 <body>
   <header class="pmo-topbar">
-    <a href="/"><img src="/wp-content/uploads/2021/10/logo-N-600x96.png" alt="Print Media Online"></a>
+    <a href="/"><img src="/assets/brand/logo-600.png" srcset="/assets/brand/logo-600.png 1x, /assets/brand/logo-1200.png 2x" width="153" height="48" alt="The Print Media &amp; Design, LLC"></a>
     <a class="home-link" href="/">View site</a>
   </header>
 
@@ -157,6 +157,7 @@
       // that client's rows — so every account sees its own data, enforced
       // server-side. Nothing here is shared or hardcoded.
       var STATUS_LABEL = { printing: 'Printing', review: 'In Review', shipped: 'Shipped', done: 'Completed', pending: 'Pending' };
+      var INVOICE_LABEL = { paid: 'Paid', unpaid: 'Unpaid', overdue: 'Overdue' };
 
       function fmtDate(iso) {
         if (!iso) return '';
@@ -257,7 +258,7 @@
             '<td class="oid">' + esc(n.invoice_ref) + '</td>' +
             '<td>' + esc(n.order_ref || '—') + '</td>' +
             '<td>' + esc(n.amount || '—') + '</td>' +
-            '<td><span class="badge ' + esc(n.status) + '">' + esc(n.status || '—') + '</span></td>' +
+            '<td><span class="badge ' + esc(n.status) + '">' + esc(INVOICE_LABEL[n.status] || n.status || '—') + '</span></td>' +
             '<td class="meta">' + esc(fmtDate(n.created_at)) + '</td>';
           ib.appendChild(tr);
         });
